@@ -21,5 +21,5 @@ class CNNBert(nn.Module):
                                    attention_mask = attention_mask, 
                                    token_type_ids = token_type_ids)
 
-        out = self.Conv2d(bert_out)
+        out = self.conv(bert_out)
         
