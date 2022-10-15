@@ -37,7 +37,6 @@ class PreprocessorToxic(pl.LightningDataModule):
 
         return string
 
-
     def load_data(self):
         data = pd.read_csv('data/preprocessed_indonesian_toxic_tweet.csv')
 
@@ -69,7 +68,6 @@ class PreprocessorToxic(pl.LightningDataModule):
         y = torch.tensor(label)
 
         tensor_dataset = TensorDataset(x_input_ids, x_token_type_ids, x_attention_mask, y)
-
         # Standard
         # 80% (Training validation) 20% (testing)
         # training = 90% validation = 10%
@@ -91,11 +89,41 @@ class PreprocessorToxic(pl.LightningDataModule):
 
         return train_dataset, valid_dataset, test_dataset
 
+    def setup(self, stage = None):
+        train_data, valid_data, test_data = self.load_data()
+        if stage == "fit":
+            self.train_data = train_data
+            self.valid_data = valid_data
+        elif stage == "predict":
+            self.test_data = test_data
 
 
+    def train_dataloader(self):
+        sampler = RandomSampler(self.train_data)
+        return DataLoader(
+            dataset = self.train_data,
+            batch_size = self.batch_size,
+            sampler = sampler,
+            num_workers = 1
+        )
 
+    def val_dataloader(self):
+        sampler = RandomSampler(self.valid_data)
+        return DataLoader(
+            dataset = self.valid_data,
+            batch_size = self.batch_size,
+            sampler = sampler,
+            num_workers = 1
+        )
 
-
+    def predict_dataloader(self):
+        sampler = SequentialSampler(self.test_data)
+        return DataLoader(
+            dataset = self.test_data,
+            batch_size = self.batch_size,
+            sampler = sampler,
+            num_workers = 1
+        )
         
         
 
