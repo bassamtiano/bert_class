@@ -6,3 +6,4 @@ from utils.preprocessor_toxic import PreprocessorToxic
 if __name__ == '__main__':
 
     dm = PreprocessorToxic()
+    model = TrainerMultilabel()

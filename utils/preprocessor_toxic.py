@@ -1,3 +1,4 @@
+import sys
 import pickle
 import re
 
@@ -56,7 +57,7 @@ class PreprocessorToxic(pl.LightningDataModule):
             tkn_tweet = self.tokenizers(text = tw,
                                         max_length = self.max_length,
                                         padding = 'max_length',
-                                        trunction = True)
+                                        truncation = True)
             
             x_input_ids.append(tkn_tweet['input_ids'])
             x_token_type_ids.append(tkn_tweet['token_type_ids'])
@@ -66,6 +67,9 @@ class PreprocessorToxic(pl.LightningDataModule):
         x_token_type_ids = torch.tensor(x_token_type_ids)
         x_attention_mask = torch.tensor(x_attention_mask)
         y = torch.tensor(label)
+
+        print(y.shape)
+        sys.exit()
 
         tensor_dataset = TensorDataset(x_input_ids, x_token_type_ids, x_attention_mask, y)
         # Standard
@@ -97,7 +101,6 @@ class PreprocessorToxic(pl.LightningDataModule):
         elif stage == "predict":
             self.test_data = test_data
 
-
     def train_dataloader(self):
         sampler = RandomSampler(self.train_data)
         return DataLoader(
@@ -124,9 +127,6 @@ class PreprocessorToxic(pl.LightningDataModule):
             sampler = sampler,
             num_workers = 1
         )
-        
-        
-
 
 if __name__ == '__main__':
     pretox = PreprocessorToxic()
