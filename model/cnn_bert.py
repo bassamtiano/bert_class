@@ -1,7 +1,8 @@
+import sys
 import torch
 import torch.nn as nn
 
-from transforms import BertModel
+from transformers import BertModel
 
 class CNNBert(nn.Module):
     def __init__(self, 
@@ -20,6 +21,7 @@ class CNNBert(nn.Module):
         bert_out = self.bert_model(input_ids = input_ids, 
                                    attention_mask = attention_mask, 
                                    token_type_ids = token_type_ids)
-
-        out = self.conv(bert_out)
-        
+        hidden_state = bert_out[0]
+        test = self.conv(hidden_state)
+        print(test)
+        sys.exit()

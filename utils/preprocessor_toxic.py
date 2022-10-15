@@ -14,9 +14,11 @@ from transformers import BertTokenizer
 
 class PreprocessorToxic(pl.LightningDataModule):
 
-    def __init__(self):
+    def __init__(self, max_length = 100, batch_size = 10):
+        super(PreprocessorToxic, self).__init__()
         self.tokenizers = BertTokenizer.from_pretrained('indolem/indobert-base-uncased')
-        self.max_length = 100
+        self.max_length = max_length
+        self.batch_size = batch_size
 
     def clean_str(self, string):
         string = string.lower()
@@ -67,9 +69,6 @@ class PreprocessorToxic(pl.LightningDataModule):
         x_token_type_ids = torch.tensor(x_token_type_ids)
         x_attention_mask = torch.tensor(x_attention_mask)
         y = torch.tensor(label)
-
-        print(y.shape)
-        sys.exit()
 
         tensor_dataset = TensorDataset(x_input_ids, x_token_type_ids, x_attention_mask, y)
         # Standard
@@ -130,4 +129,4 @@ class PreprocessorToxic(pl.LightningDataModule):
 
 if __name__ == '__main__':
     pretox = PreprocessorToxic()
-    pretox.load_data()
+    train_dataset, valid_dataset, test_dataset = pretox.load_data()
