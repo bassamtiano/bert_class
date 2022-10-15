@@ -11,10 +11,10 @@ class CNNBert(nn.Module):
         super().__init__()
 
         self.bert_model = BertModel.from_pretrained('indolem/indobert-base-uncased')
-        self.Conv2d(in_channels = in_channels, 
-                    out_channels = out_channels,
-                    kernel_size = 10,
-                    stride = 1)
+        self.conv = nn.Conv2d(in_channels = in_channels, 
+                              out_channels = out_channels,
+                              kernel_size = kernel_size,
+                              stride = 1)
 
     def forward(self, input_ids, token_type_ids, attention_mask):
         bert_out = self.bert_model(input_ids = input_ids, 
