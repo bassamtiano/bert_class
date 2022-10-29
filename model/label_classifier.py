@@ -11,6 +11,7 @@ class LabelClassifier(nn.Module):
         self.pre_classifier = nn.Linear(768, 768)
         self.dropout = nn.Dropout(dropout)
         self.classifier = nn.Linear(768, n_out)
+        
 
     def forward(self, input_ids, attention_mask, token_type_ids):
         bert_out = self.l1(input_ids = input_ids, attention_mask = attention_mask, token_type_ids = token_type_ids)

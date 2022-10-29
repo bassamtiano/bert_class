@@ -11,6 +11,7 @@ class Classifier(BertPreTrainedModel):
         super(Classifier ,self).__init__(bert_config)
         self.bert = BertModel(bert_config) 
         self.dropout = nn.Dropout(bert_config.hidden_dropout_prob)
+        
         # self.dropout = nn.Dropout(dropout)
         self.classifier = nn.Linear(in_features = bert_config.hidden_size, 
                                     out_features = num_classes)

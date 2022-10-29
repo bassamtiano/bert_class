@@ -14,7 +14,7 @@ from transformers import BertTokenizer
 
 class PreprocessorToxic(pl.LightningDataModule):
 
-    def __init__(self, max_length = 100, batch_size = 10):
+    def __init__(self, max_length = 100, batch_size = 40):
         super(PreprocessorToxic, self).__init__()
         self.tokenizers = BertTokenizer.from_pretrained('indolem/indobert-base-uncased')
         self.max_length = max_length
@@ -41,17 +41,38 @@ class PreprocessorToxic(pl.LightningDataModule):
         return string
 
     def load_data(self):
-        data = pd.read_csv('data/preprocessed_indonesian_toxic_tweet.csv')
+        data = pd.read_csv('data/preprocessed_indonesian_toxic_tweet.csv', sep=",")
 
         # Semua kolom di cek yang kosong di drop
         data = data.dropna(how="any")
         # Spesifik remove karakter null berdasarkan kolom
-        data = data[data[['Tweet', 'HS_Strong']].notna()]
+        # data = data[data.notna()]
         
+        condition_empty_label = data[
+            (
+                (data['HS'] == 0) &
+                (data['Abusive'] == 0) &
+                (data['HS_Individual'] == 0) &
+                (data['HS_Group'] == 0) &
+                (data['HS_Religion'] == 0) &
+                (data['HS_Race'] == 0) &
+                (data['HS_Physical'] == 0) &
+                (data['HS_Gender'] == 0) &
+                (data['HS_Other'] == 0) &
+                (data['HS_Weak'] == 0) &
+                (data['HS_Moderate'] == 0) &
+                (data['HS_Strong'] == 0)
+            )
+        ].index
+
+        data = data.drop(condition_empty_label)
+
         tweet = data["Tweet"].apply(lambda x: self.clean_str(x))
         tweet = tweet.values.tolist()
         label = data.drop(["Tweet"], axis = 1)
         label = label.values.tolist()
+
+        self.labels = data.columns.tolist()[1:]
 
         x_input_ids, x_token_type_ids, x_attention_mask, y = [], [], [], []
 
@@ -64,6 +85,8 @@ class PreprocessorToxic(pl.LightningDataModule):
             x_input_ids.append(tkn_tweet['input_ids'])
             x_token_type_ids.append(tkn_tweet['token_type_ids'])
             x_attention_mask.append(tkn_tweet['attention_mask'])
+
+        
 
         x_input_ids = torch.tensor(x_input_ids)
         x_token_type_ids = torch.tensor(x_token_type_ids)
@@ -92,6 +115,10 @@ class PreprocessorToxic(pl.LightningDataModule):
 
         return train_dataset, valid_dataset, test_dataset
 
+
+    def get_labels(self):
+        return self.labels
+
     def setup(self, stage = None):
         train_data, valid_data, test_data = self.load_data()
         if stage == "fit":
@@ -106,7 +133,7 @@ class PreprocessorToxic(pl.LightningDataModule):
             dataset = self.train_data,
             batch_size = self.batch_size,
             sampler = sampler,
-            num_workers = 1
+            num_workers = 4
         )
 
     def val_dataloader(self):
@@ -115,7 +142,7 @@ class PreprocessorToxic(pl.LightningDataModule):
             dataset = self.valid_data,
             batch_size = self.batch_size,
             sampler = sampler,
-            num_workers = 1
+            num_workers = 4
         )
 
     def predict_dataloader(self):
@@ -124,9 +151,9 @@ class PreprocessorToxic(pl.LightningDataModule):
             dataset = self.test_data,
             batch_size = self.batch_size,
             sampler = sampler,
-            num_workers = 1
+            num_workers = 4
         )
 
-if __name__ == '__main__':
-    pretox = PreprocessorToxic()
-    train_dataset, valid_dataset, test_dataset = pretox.load_data()
+# if __name__ == '__main__':
+#     pretox = PreprocessorToxic()
+#     train_dataset, valid_dataset, test_dataset = pretox.load_data()

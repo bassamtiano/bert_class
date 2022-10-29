@@ -1,7 +1,7 @@
 import torch
 # from cleantext import clean
-from transformers import BertTokenizer
-from sklearn.metrics import classification_report
+# from transformers import BertTokenizer
+# from sklearn.metrics import classification_report
 
 # #provide string with emojis
 # text = "Mpok sylvi udah mulai emosi\ud83d\ude02\n #DebatFinalPilkadaJKT"
@@ -21,10 +21,14 @@ from sklearn.metrics import classification_report
 #                                y_pred)
 # print(report)
 
-data = torch.rand(100, 2)
+# data = torch.rand(100, 2)
 
-print(data.shape)
+# print(data.shape)
 
-train, test = torch.utils.data.random_split(data, [data.shape[0] * 0.8, data.shape[0] * 0.2], generator = torch.Generator().manual_seed(42))
-print(train.shape)
-print(test.shape)
+# train, test = torch.utils.data.random_split(data, [data.shape[0] * 0.8, data.shape[0] * 0.2], generator = torch.Generator().manual_seed(42))
+# print(train.shape)
+# print(test.shape)
+
+
+checkpoints = torch.load("logs/bert_multilabel/version_0/checkpoints/epoch=4-step=660.ckpt")
+print(checkpoints['state_dict'].keys())
